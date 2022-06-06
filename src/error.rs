@@ -1,4 +1,4 @@
-use cosmwasm_std::StdError;
+use cosmwasm_std::{Coin, StdError};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -9,8 +9,12 @@ pub enum ContractError {
     #[error("Unauthorized")]
     Unauthorized {},
 
-    #[error("Custom Error val: {val:?}")]
-    CustomError { val: String },
-    // Add any other custom errors you like here.
-    // Look at https://docs.rs/thiserror/1.0.21/thiserror/ for details.
+    #[error("Contract expired (end_height {end_height:?} end_time {end_time:?})")]
+    Expired {
+        end_height: Option<u64>,
+        end_time: Option<u64>,
+    },
+
+    #[error("Insufficient funds! Required: {funds:?}")]
+    InsufficientFunds { funds: Vec<Coin> },
 }
