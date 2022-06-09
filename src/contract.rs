@@ -66,8 +66,11 @@ pub fn handle_transfer(
     }
     // If the amount is less than the capital being raised,
     // show an error
-    if info.funds != state.capital {
-        return Err(ContractError::InsufficientFunds { funds: info.funds });
+    if info.funds[0].amount.u128() != state.capital {
+        return Err(ContractError::InsufficientFunds {
+            funds: state.capital,
+            sent: info.funds,
+        });
     }
 
     // Else proceed with the transfer
@@ -75,7 +78,7 @@ pub fn handle_transfer(
     Ok(Response::new()
         .add_message(BankMsg::Send {
             to_address: state.owner.to_string(),
-            amount: state.capital,
+            amount: info.funds,
         })
         .add_attribute("action", "transfer"))
 }
@@ -96,12 +99,12 @@ pub fn query_config(deps: Deps) -> State {
 mod tests {
     use super::*;
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
-    use cosmwasm_std::{coins, Addr, BankMsg, SubMsg, Timestamp};
+    use cosmwasm_std::{coins, Addr, BankMsg, SubMsg, Timestamp, Uint128};
 
     fn init_msg_expire_by_height(height: u64) -> InstantiateMsg {
         InstantiateMsg {
             owner: String::from("recipient"),
-            capital: coins(200, "ubit"),
+            capital: 200u128,
             end_height: Some(height),
         }
     }
@@ -119,7 +122,7 @@ mod tests {
         assert_eq!(0, res.messages.len());
 
         let res = query_config(deps.as_ref());
-        assert_eq!(coins(200, "ubit"), res.capital);
+        assert_eq!(200u128, res.capital);
         assert_eq!(Addr::unchecked("recipient"), res.owner);
         assert_eq!(None, res.sender);
         assert_eq!(Some(5), res.end_height);
@@ -133,7 +136,7 @@ mod tests {
         env.block.height = 6;
         env.block.time = Timestamp::from_seconds(0);
 
-        let info = mock_info("creator", &coins(200, "ubit"));
+        let info = mock_info("sender", &coins(200, "ubit"));
         let res = instantiate(deps.as_mut(), env, info, msg).unwrap_err();
         match res {
             ContractError::Expired { .. } => {}
@@ -154,6 +157,7 @@ mod tests {
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(0, res.messages.len());
 
+        // Move block height to anything greater than 5 to validate expiry
         env.block.height = 6;
         env.block.time = Timestamp::from_seconds(4);
 
@@ -174,7 +178,7 @@ mod tests {
         env.block.time = Timestamp::from_seconds(0);
 
         // This should be 200ubits, not 100ubits
-        let info = mock_info("creator", &coins(100, "ubit"));
+        let info = mock_info("sender", &coins(100, "ubit"));
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(0, res.messages.len());
 
@@ -194,7 +198,6 @@ mod tests {
         env.block.height = 3;
         env.block.time = Timestamp::from_seconds(0);
 
-        // This should be 200ubits, not 100ubits
         let info = mock_info("sender", &coins(200, "ubit"));
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(0, res.messages.len());
@@ -208,6 +211,12 @@ mod tests {
                 to_address: "recipient".into(),
                 amount: coins(200, "ubit"),
             })
-        )
+        );
+    }
+    #[test]
+    fn number_of_coins() {
+        let value = coins(12, "ubit");
+        assert_eq!(1, value.len());
+        assert_eq!(Uint128::from(12u64).u128(), value[0].amount.u128());
     }
 }

@@ -1,5 +1,4 @@
 use crate::state::State;
-use cosmwasm_std::Coin;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -8,7 +7,7 @@ pub struct InstantiateMsg {
     /// Owner is the account where the money is to be transfered
     pub owner: String,
     /// Amount to be raised
-    pub capital: Vec<Coin>,
+    pub capital: u128,
     pub end_height: Option<u64>,
 }
 

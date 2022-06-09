@@ -1,4 +1,4 @@
-use cosmwasm_std::{Addr, Coin, Env, Storage};
+use cosmwasm_std::{Addr, Env, Storage};
 use cosmwasm_storage::{singleton, singleton_read, ReadonlySingleton, Singleton};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -9,7 +9,7 @@ static CONFIG_KEY: &[u8] = b"config";
 pub struct State {
     pub owner: Addr,
     pub sender: Option<Addr>,
-    pub capital: Vec<Coin>,
+    pub capital: u128,
     pub end_height: Option<u64>,
 }
 
