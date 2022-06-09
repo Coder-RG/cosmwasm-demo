@@ -5,12 +5,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {
-    /// Recipient is the account where the money is to be transfered
+    /// Owner is the account where the money is to be transfered
     pub owner: String,
     /// Amount to be raised
     pub capital: Vec<Coin>,
     pub end_height: Option<u64>,
-    pub end_time: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

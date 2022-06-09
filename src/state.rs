@@ -8,10 +8,9 @@ static CONFIG_KEY: &[u8] = b"config";
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct State {
     pub owner: Addr,
-    pub sender: Addr,
+    pub sender: Option<Addr>,
     pub capital: Vec<Coin>,
     pub end_height: Option<u64>,
-    pub end_time: Option<u64>,
 }
 
 impl State {
@@ -22,11 +21,11 @@ impl State {
             }
         }
 
-        if let Some(end_time) = self.end_time {
-            if env.block.time.nanos() > end_time * 1000 {
-                return true;
-            }
-        }
+        // if let Some(end_time) = self.end_time {
+        //     if env.block.time.nanos() > end_time * 1000 {
+        //         return true;
+        //     }
+        // }
         false
     }
 }

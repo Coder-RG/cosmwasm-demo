@@ -9,11 +9,8 @@ pub enum ContractError {
     #[error("Unauthorized")]
     Unauthorized {},
 
-    #[error("Contract expired (end_height {end_height:?} end_time {end_time:?})")]
-    Expired {
-        end_height: Option<u64>,
-        end_time: Option<u64>,
-    },
+    #[error("Contract expired (end_height {end_height:?}")]
+    Expired { end_height: Option<u64> },
 
     #[error("Insufficient funds! Required: {funds:?}")]
     InsufficientFunds { funds: Vec<Coin> },
