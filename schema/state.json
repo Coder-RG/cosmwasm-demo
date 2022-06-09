@@ -4,8 +4,7 @@
   "type": "object",
   "required": [
     "capital",
-    "owner",
-    "sender"
+    "owner"
   ],
   "properties": {
     "capital": {
@@ -22,19 +21,18 @@
       "format": "uint64",
       "minimum": 0.0
     },
-    "end_time": {
-      "type": [
-        "integer",
-        "null"
-      ],
-      "format": "uint64",
-      "minimum": 0.0
-    },
     "owner": {
       "$ref": "#/definitions/Addr"
     },
     "sender": {
-      "$ref": "#/definitions/Addr"
+      "anyOf": [
+        {
+          "$ref": "#/definitions/Addr"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   },
   "definitions": {

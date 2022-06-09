@@ -22,16 +22,8 @@
       "format": "uint64",
       "minimum": 0.0
     },
-    "end_time": {
-      "type": [
-        "integer",
-        "null"
-      ],
-      "format": "uint64",
-      "minimum": 0.0
-    },
     "owner": {
-      "description": "Recipient is the account where the money is to be transfered",
+      "description": "Owner is the account where the money is to be transfered",
       "type": "string"
     }
   },
