@@ -96,7 +96,7 @@ pub fn query_config(deps: Deps) -> State {
 mod tests {
     use super::*;
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
-    use cosmwasm_std::{coins, Addr, Timestamp};
+    use cosmwasm_std::{coins, Addr, BankMsg, SubMsg, Timestamp};
 
     fn init_msg_expire_by_height(height: u64) -> InstantiateMsg {
         InstantiateMsg {
@@ -184,5 +184,30 @@ mod tests {
             ContractError::InsufficientFunds { .. } => {}
             e => panic!("Another error occured: {:?}", e),
         }
+    }
+
+    #[test]
+    fn tranfer_sufficient_funds() {
+        let mut deps = mock_dependencies();
+        let msg = init_msg_expire_by_height(5);
+        let mut env = mock_env();
+        env.block.height = 3;
+        env.block.time = Timestamp::from_seconds(0);
+
+        // This should be 200ubits, not 100ubits
+        let info = mock_info("sender", &coins(200, "ubit"));
+        let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
+        assert_eq!(0, res.messages.len());
+
+        let msg = ExecuteMsg::Transfer {};
+        let res = execute(deps.as_mut(), env, info, msg).unwrap();
+        assert_eq!(1, res.messages.len());
+        assert_eq!(
+            res.messages[0],
+            SubMsg::new(BankMsg::Send {
+                to_address: "recipient".into(),
+                amount: coins(200, "ubit"),
+            })
+        )
     }
 }
