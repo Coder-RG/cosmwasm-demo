@@ -99,7 +99,7 @@ pub fn query_config(deps: Deps) -> State {
 mod tests {
     use super::*;
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
-    use cosmwasm_std::{coins, Addr, BankMsg, SubMsg, Timestamp, Uint128};
+    use cosmwasm_std::{coins, Addr, BankMsg, CosmosMsg, Timestamp, Uint128};
 
     fn init_msg_expire_by_height(height: u64) -> InstantiateMsg {
         InstantiateMsg {
@@ -206,8 +206,8 @@ mod tests {
         let res = execute(deps.as_mut(), env, info, msg).unwrap();
         assert_eq!(1, res.messages.len());
         assert_eq!(
-            res.messages[0],
-            SubMsg::new(BankMsg::Send {
+            res.messages[0].msg,
+            CosmosMsg::Bank(BankMsg::Send {
                 to_address: "recipient".into(),
                 amount: coins(200, "ubit"),
             })
