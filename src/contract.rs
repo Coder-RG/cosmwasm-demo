@@ -19,7 +19,7 @@ pub fn instantiate(
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     let state = State {
-        owner: info.sender.clone(),
+        owner: info.sender,
         sender: None,
         capital: msg.capital,
         end_height: msg.end_height,
