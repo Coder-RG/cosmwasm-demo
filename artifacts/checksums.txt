@@ -1,1 +1,1 @@
-d53ac2599714dbe262e590bd3c4e5724d1d25929c21fb74778cec822704be500  simple_test_case-aarch64.wasm
+52ec4026696dddfe6a16cae318ad5473e3489c413218c1eca4cccde629e76e84  simple_test_case-aarch64.wasm

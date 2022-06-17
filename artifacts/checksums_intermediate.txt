@@ -1,1 +1,1 @@
-a6b4f3319a9833ac183823794eae4a8dc833d5d7ac282fc73ffb8d1fc49c047f  ./target/wasm32-unknown-unknown/release/simple_test_case.wasm
+2303cd3f8ba6822157aa8993aa5ac5e21a31bb67e950c022c57d206062586530  ./target/wasm32-unknown-unknown/release/simple_test_case.wasm
