@@ -15,11 +15,11 @@ use crate::state::{config, config_read, State};
 pub fn instantiate(
     deps: DepsMut,
     env: Env,
-    _info: MessageInfo,
+    info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     let state = State {
-        owner: deps.api.addr_validate(&msg.owner)?,
+        owner: info.sender.clone(),
         sender: None,
         capital: msg.capital,
         end_height: msg.end_height,
@@ -103,7 +103,6 @@ mod tests {
 
     fn init_msg_expire_by_height(height: u64) -> InstantiateMsg {
         InstantiateMsg {
-            owner: String::from("recipient"),
             capital: 200u128,
             end_height: Some(height),
         }
@@ -117,7 +116,7 @@ mod tests {
         env.block.height = 3;
         env.block.time = Timestamp::from_seconds(0);
 
-        let info = mock_info("creator", &coins(200, "ubit"));
+        let info = mock_info("recipient", &coins(200, "upebble"));
         let res = instantiate(deps.as_mut(), env, info, msg).unwrap();
         assert_eq!(0, res.messages.len());
 
@@ -136,7 +135,7 @@ mod tests {
         env.block.height = 6;
         env.block.time = Timestamp::from_seconds(0);
 
-        let info = mock_info("sender", &coins(200, "ubit"));
+        let info = mock_info("sender", &coins(200, "upebble"));
         let res = instantiate(deps.as_mut(), env, info, msg).unwrap_err();
         match res {
             ContractError::Expired { .. } => {}
@@ -153,7 +152,7 @@ mod tests {
         env.block.time = Timestamp::from_seconds(0);
 
         // Instantiate without any issues
-        let info = mock_info("sender", &coins(200, "ubit"));
+        let info = mock_info("sender", &coins(200, "upebble"));
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(0, res.messages.len());
 
@@ -177,8 +176,8 @@ mod tests {
         env.block.height = 3;
         env.block.time = Timestamp::from_seconds(0);
 
-        // This should be 200ubits, not 100ubits
-        let info = mock_info("sender", &coins(100, "ubit"));
+        // This should be 200upebbles, not 100upebbles
+        let info = mock_info("sender", &coins(100, "upebble"));
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(0, res.messages.len());
 
@@ -198,10 +197,11 @@ mod tests {
         env.block.height = 3;
         env.block.time = Timestamp::from_seconds(0);
 
-        let info = mock_info("sender", &coins(200, "ubit"));
+        let info = mock_info("recipient", &coins(0, "upebble"));
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         assert_eq!(0, res.messages.len());
 
+        let info = mock_info("sender", &coins(200, "upebble"));
         let msg = ExecuteMsg::Transfer {};
         let res = execute(deps.as_mut(), env, info, msg).unwrap();
         assert_eq!(1, res.messages.len());
@@ -209,13 +209,13 @@ mod tests {
             res.messages[0].msg,
             CosmosMsg::Bank(BankMsg::Send {
                 to_address: "recipient".into(),
-                amount: coins(200, "ubit"),
+                amount: coins(200, "upebble"),
             })
         );
     }
     #[test]
     fn number_of_coins() {
-        let value = coins(12, "ubit");
+        let value = coins(12, "upebble");
         assert_eq!(1, value.len());
         assert_eq!(Uint128::from(12u64).u128(), value[0].amount.u128());
     }

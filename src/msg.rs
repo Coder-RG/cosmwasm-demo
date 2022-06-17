@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {
     /// Owner is the account where the money is to be transfered
-    pub owner: String,
+    // pub owner: String,
     /// Amount to be raised
     pub capital: u128,
     pub end_height: Option<u64>,
